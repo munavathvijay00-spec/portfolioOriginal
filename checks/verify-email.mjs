@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import vm from 'node:vm';
+const require=createRequire(import.meta.url);const ts=require('typescript');
+const source=await readFile('lib/email.ts','utf8');const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const exports={};vm.runInNewContext(compiled,{exports,require,AbortSignal,fetch});
+assert.equal(exports.emailConfigured('key','sender@example.test'),true);assert.equal(exports.emailConfigured('','sender@example.test'),false);assert.equal(exports.emailConfigured('key','bad sender'),false);
+const payload=exports.notificationPayload('sender@example.test','munavathvijay00@gmail.com',{name:'<script>alert(1)</script>',email:'visitor@example.test',message:'Hello <img src=x> from a visitor.'});assert.equal(payload.html,undefined);assert.equal(payload.reply_to,'visitor@example.test');
+let idempotency;const response=await exports.sendNotification(payload,'test-key','test-id',async(url,init)=>{assert.equal(url,'https://api.resend.com/emails');idempotency=init.headers['Idempotency-Key'];assert.equal(init.headers.Authorization,'Bearer test-key');assert.ok(init.signal);return Response.json({id:'accepted-id'});});assert.equal(response.status,'sent');assert.equal(idempotency,'portfolio-contact/test-id');
+const failed=await exports.sendNotification(payload,'key','id',async()=>Response.json({secret:'should never appear'},{status:401}));assert.equal(failed.status,'failed');assert.ok(!JSON.stringify(failed).includes('secret'));
+assert.equal((await exports.sendNotification(payload,'key','id',async()=>{throw new Error('private error');})).status,'unknown');assert.equal((await exports.sendNotification(payload,'key','id',async()=>Response.json({},{status:503}))).status,'unknown');assert.equal((await exports.sendNotification(payload,'key','id',async()=>Response.json({}))).status,'unknown');
+console.log('Email checks passed: configuration, plain-text payload, reply-to, fixed recipient, idempotency, acceptance and failure handling.');

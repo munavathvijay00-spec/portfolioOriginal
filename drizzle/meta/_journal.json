@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790950869722,
+      "tag": "0000_acoustic_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790950949451,
+      "tag": "0001_eager_sleepwalker",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790952339583,
+      "tag": "0002_milky_newton_destine",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790958471283,
+      "tag": "0003_magenta_raider",
+      "breakpoints": true
+    }
+  ]
+}

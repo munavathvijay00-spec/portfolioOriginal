@@ -1,0 +1,1 @@
+ALTER TABLE `portfolio` ADD `content_version` integer DEFAULT 1 NOT NULL;

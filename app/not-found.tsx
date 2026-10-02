@@ -1,0 +1,1 @@
+export default function NotFound(){return <main id="main" className="unavailable"><span className="eyebrow">404</span><h1>This page isn’t here.</h1><a className="button primary" href="/">Back to portfolio</a></main>;}

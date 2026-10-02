@@ -1,0 +1,3 @@
+import { bucket, database } from "@/lib/store";
+import { failure, HttpError } from "@/lib/http";
+export async function GET(request:Request,{params}:{params:Promise<{id:string}>}){try{const {id}=await params;if(!/^[a-f0-9-]{36}$/.test(id))throw new HttpError(404,"Photo not found.");const asset=await database().prepare("SELECT object_key,content_type FROM assets WHERE id=?").bind(id).first<{object_key:string,content_type:string}>();if(!asset)throw new HttpError(404,"Photo not found.");const object=await bucket().get(asset.object_key);if(!object)throw new HttpError(404,"Photo not found.");return new Response(object.body,{headers:{"Content-Type":asset.content_type,"X-Content-Type-Options":"nosniff","Cache-Control":"private, max-age=3600"}});}catch(e){return failure(e);}}
